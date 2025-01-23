@@ -306,6 +306,43 @@ public class ArvBinBusca<Chave extends Comparable<Chave>, Valor>
         return x;
     }
 
+    public void deleteAntecessor(Chave chave)
+    {
+        raiz = deleteAntecessor(raiz, chave);
+    }
+
+    /* Remove o n� com o valor "val" da "�rvore" a partir do n� para o qual est� sendo chamada a fun��o. Obs: "ref_no" � o ponteiro que referencia o n� para o qual est� sendo chamada a fun��o, o qual pode ter que ser modificado. Retorna false se o valor n�o pertencer � "�rvore".
+     */
+    private No deleteAntecessor(No x, Chave chave)
+    {
+        if (x == null)
+            return null;
+
+        int cmp = chave.compareTo(x.chave);
+
+        if(cmp < 0)
+            x.esq = deleteAntecessor(x.esq, chave);
+        else if(cmp > 0)
+            x.dir = deleteAntecessor(x.dir, chave);
+        else
+        {
+            if(x.dir == null)
+                return x.esq;
+            if(x.esq  == null)
+                return x.dir;
+
+            No t = x;
+
+            x = max(t.esq);
+
+            x.esq = deleteMax(t.esq);
+
+            x.dir = t.dir;
+        }
+
+        return x;
+    }
+
 
 
     public Chave piso(Chave chave)
@@ -401,27 +438,23 @@ public class ArvBinBusca<Chave extends Comparable<Chave>, Valor>
 
     public void removeLaura(int qtdNos){
         Random gerador = new Random();
+        Random antSuc = new Random();
         for(int i = 0; i < (qtdNos * qtdNos); i++){
-            //int tentativasRemover = 0;
             int antigoNo;
             do{
                 antigoNo = gerador.nextInt(100,1000000);
-                //tentativasRemover++;
-                //if(tentativasRemover > 999)
-                //    break;
             }while(!this.contem((Chave) Integer.valueOf(antigoNo)));
             No no = new No ((Chave) Integer.valueOf(antigoNo),(Valor) Integer.valueOf(antigoNo));
-            this.delete(no, no.chave);
+            int eAntSuc = antSuc.nextInt(0,1);
+            if(eAntSuc == 0)
+                this.delete(no, no.chave);
+            else
+                this.deleteAntecessor(no, no.chave);
             int novoNo;
-            //int tentativasInserir = 0;
             do{
                 novoNo = gerador.nextInt(100,1000000);
-                //tentativasInserir++;
-                //if (tentativasInserir > 999)
-                //    break;
             }while(this.contem((Chave) Integer.valueOf(novoNo)));
             this.put((Chave) Integer.valueOf(novoNo),(Valor) Integer.valueOf(novoNo));
-            //System.out.println(i); //Verificação. Caso eu tenha esquecido de remover, ignore rs
         }
     }
 }
